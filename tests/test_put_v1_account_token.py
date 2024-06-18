@@ -1,4 +1,5 @@
 import time
+from dm_api_account.models.registration import Registration
 from services.dm_api_account import DmApiAccount
 from services.mailhog import MailhogApi
 
@@ -6,11 +7,11 @@ from services.mailhog import MailhogApi
 def test_put_v1_account_token():
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
-    json = {
-        "login": "User015",
-        "email": "Postman_user015@gmail.com",
-        "password": "resu4321"
-    }
+    json = Registration(
+        login="Cat7",
+        email="Kitty_cat7@gmail.com",
+        password="meowmeow"
+    )
     api.account.post_v1_account(json=json)
     time.sleep(2)
     token = mailhog.get_token_from_last_email()

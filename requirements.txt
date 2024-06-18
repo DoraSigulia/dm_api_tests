@@ -2,3 +2,5 @@ requests
 pytest
 structlog
 curlify
+pydantic
+enam
