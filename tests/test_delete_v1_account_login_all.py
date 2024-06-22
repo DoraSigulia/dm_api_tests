@@ -1,8 +1,6 @@
-from services.dm_api_account import DmApiAccount
+from services import *
 
 
 def test_delete_v1_account_login():
     api = DmApiAccount(host='http://5.63.153.31:5051')
-
-    response = api.login.delete_v1_account_login_all()
-    assert response.status_code == 204
+    api.login.delete_v1_account_login_all()

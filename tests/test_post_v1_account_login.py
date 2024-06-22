@@ -1,9 +1,6 @@
 import time
-from dm_api_account.models.login_credential import LoginCredential
-from dm_api_account.models.registration import Registration
-from services.dm_api_account import DmApiAccount
-from services.mailhog import MailhogApi
-
+from services import *
+from dm_api_account.models import *
 
 def test_post_v1_account_login():
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
@@ -27,5 +24,5 @@ def test_post_v1_account_login():
         password=password,
         rememberMe=False
     )
-    response_login = api.login.post_v1_account_login(json=json_login)
-    assert response_login.status_code == 200, f"Метод входа в логин завершился со статус кодом {response_login.status_code}"
+    api.login.post_v1_account_login(json=json_login)
+

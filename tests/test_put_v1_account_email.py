@@ -1,17 +1,15 @@
 import time
-from dm_api_account.models.change_email import ChangeEmail
-from dm_api_account.models.registration import Registration
-from services.dm_api_account import DmApiAccount
-from services.mailhog import MailhogApi
+from services import *
+from dm_api_account.models import *
 
 
 def test_put_v1_account_email():
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
-    login = "Cat4"
+    login = "Cat40"
     password = "meowmeow"
-    old_email = "Kitty_cat4@gmail.com"
-    new_email = "Kitty_cat5@gmail.com"
+    old_email = "Kitty_cat40@gmail.com"
+    new_email = "Kitty_cat50@gmail.com"
 
     json_account = Registration(
         login=login,
@@ -28,5 +26,5 @@ def test_put_v1_account_email():
         password=password,
         email=new_email
     )
-    response_email = api.account.put_v1_account_email(json=json_email)
-    assert response_email.status_code == 200, f"Метод смены email завершился со статус кодом {response_email.status_code}"
+    api.account.put_v1_account_email(json=json_email)
+

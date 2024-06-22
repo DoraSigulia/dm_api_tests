@@ -1,16 +1,16 @@
 import time
-from dm_api_account.models.registration import Registration
-from dm_api_account.models.reset_password import ResetPassword
-from services.dm_api_account import DmApiAccount
-from services.mailhog import MailhogApi
+from dm_api_account.models.user_envelope import Roles
+from services import *
+from dm_api_account.models import *
+from hamcrest import assert_that, has_properties
 
 
 def test_post_v1_account_password():
     api = DmApiAccount(host='http://5.63.153.31:5051')
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    login = "Cat3"
+    login = "Cat30"
     password = "meowmeow"
-    email = "Kitty_cat3@gmail.com"
+    email = "Kitty_cat30@gmail.com"
 
     json_account = Registration(
         login=login,
@@ -27,4 +27,10 @@ def test_post_v1_account_password():
         email=email
     )
     response = api.account.post_v1_account_password(json=json)
-    assert response.status_code == 200, f"Метод входа в логин завершился со статус кодом {response.status_code}"
+    assert_that(response.resource, has_properties(
+        {
+            "login": login,
+            "roles": [Roles.GUEST, Roles.PLAYER],
+            "medium_picture_url": None
+        }
+    ))
