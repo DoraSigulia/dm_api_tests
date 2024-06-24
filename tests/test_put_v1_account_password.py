@@ -1,13 +1,15 @@
 import time
 from services import *
 from dm_api_account.models import *
+from hamcrest import assert_that, has_properties
+from dm_api_account.models.user_envelope import Roles
 
 
 def test_put_v1_account_password():
     api = DmApiAccount(host='http://5.63.153.31:5051')
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    login = "Cat76"
-    email = "Kitty_cat76@gmail.com"
+    login = "Cat__"
+    email = "Kitty_cat__@gmail.com"
     old_password = "meowmeow1"
     new_password = "meowmeow2"
 
@@ -35,5 +37,18 @@ def test_put_v1_account_password():
         oldPassword=old_password,
         newPassword=new_password
     )
-    api.account.put_v1_account_password(json=json)
-
+    response_password = api.account.put_v1_account_password(json=json)
+    assert_that(response_password.resource, has_properties(
+        {
+            "login": login,
+            "roles": [Roles.GUEST, Roles.PLAYER],
+            "medium_picture_url": None
+        }
+    ))
+    assert_that(response_password.resource.rating, has_properties(
+        {
+            "enabled": True,
+            "quality": 0,
+            "quantity": 0
+        }
+    ))

@@ -1,15 +1,16 @@
 import time
 from services import *
 from dm_api_account.models import *
+from hamcrest import assert_that, has_properties
 
 
 def test_put_v1_account_email():
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
-    login = "Cat40"
+    login = "Cat41"
     password = "meowmeow"
-    old_email = "Kitty_cat40@gmail.com"
-    new_email = "Kitty_cat50@gmail.com"
+    old_email = "Kitty_cat41@gmail.com"
+    new_email = "Kitty_cat51@gmail.com"
 
     json_account = Registration(
         login=login,
@@ -26,5 +27,11 @@ def test_put_v1_account_email():
         password=password,
         email=new_email
     )
-    api.account.put_v1_account_email(json=json_email)
-
+    response_email = api.account.put_v1_account_email(json=json_email)
+    assert_that(response_email.resource.rating, has_properties(
+        {
+            "enabled": True,
+            "quality": 0,
+            "quantity": 0
+        }
+    ))
