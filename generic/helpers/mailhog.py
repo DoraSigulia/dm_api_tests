@@ -72,7 +72,12 @@ class MailhogApi:
         token_url = (json.loads(email['items'][0]['Content']['Body']))['ConfirmationLinkUri']
         return token_url.split('/')[-1]
 
-    def get_token_by_login(self, login: str, limit: int = 5, attempt: int = 5):
+    def get_token_by_login(
+            self,
+            login: str,
+            limit: int = 5,
+            attempt: int = 5
+    ):
         if attempt == 0:
             raise AssertionError(f"Пользователь с логином {login} не найден")
         emails = self.get_api_v2_massages(limit=limit).json()['items']
@@ -85,7 +90,12 @@ class MailhogApi:
         time.sleep(1)
         return self.get_token_by_login(login=login, attempt=attempt - 1)
 
-    def get_reset_token_by_login(self, login: str, limit: int = 5, attempt: int = 5):
+    def get_reset_token_by_login(
+            self,
+            login: str,
+            limit: int = 5,
+            attempt: int = 5
+    ):
         if attempt == 0:
             raise AssertionError(f"Пользователь с логином {login} не найден")
         emails = self.get_api_v2_massages(limit=limit).json()['items']
