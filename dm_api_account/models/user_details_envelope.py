@@ -56,7 +56,7 @@ class UserDetails(BaseModel):
     login: StrictStr
     role: List[UserRoles]
     medium_picture_url: Optional[StrictStr] = Field(alias='mediumPictureUrl', default=None)
-    small_picture_url: Optional[StrictStr] = Field(alias='smallPictureUrl',default=None)
+    small_picture_url: Optional[StrictStr] = Field(alias='smallPictureUrl', default=None)
     status: Optional[StrictStr] = Field(default=None)
     rating: Rating
     online: Optional[AwareDatetime] = Field(default=None)
@@ -69,6 +69,25 @@ class UserDetails(BaseModel):
     settings: UserSettings
 
 
+class Resource(BaseModel):
+    field_ref: StrictStr = Field(..., alias='$ref')
+
+
+class Metadata(BaseModel):
+    description: StrictStr = Field(default=None)
+    nullable: bool = Field(default=None)
+
+
+class Properties12(BaseModel):
+    resource: Resource
+    metadata: Metadata
+
+
 class UserDetailsEnvelope(BaseModel):
-    resource: Optional[UserDetails] = Field(default=None)
-    metadata: Optional[StrictStr] = Field(default=None)
+    type: StrictStr = Field(default=None)
+    properties: Properties12 = Field(default=None)
+    additional_properties: bool = Field(default=None, alias='additionalProperties')
+    description: StrictStr = Field(default=None)
+
+
+

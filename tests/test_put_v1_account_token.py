@@ -6,19 +6,17 @@ from hamcrest import assert_that, has_properties
 
 
 def test_put_v1_account_token():
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
-    login = "Cat215"
+    api = Facade(host='http://5.63.153.31:5051')
+    login = "Fox10"
+    email = "Fox10@gmail.com"
+    password = "gavgav"
 
-    json = Registration(
+    api.account.register_new_user(
         login=login,
-        email="Kitty_cat215@gmail.com",
-        password="meowmeow"
+        email=email,
+        password=password
     )
-    api.account.post_v1_account(json=json)
-    time.sleep(2)
-    token = mailhog.get_token_from_last_email()
-    response_token = api.account.put_v1_account_token(token=token)
+    response_token = api.account.activate_registered_user(login=login)
     assert_that(response_token.resource, has_properties(
         {
             "login": login,

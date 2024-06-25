@@ -26,16 +26,16 @@ class LoginApi:
 
         response = self.client.post(
             path="/v1/account/login",
-            json=validate_request_json(json),
-            **kwargs
+            json=validate_request_json(json)
         )
         validate_status_code(
             response,
             status_code
         )
         if status_code == 200:
-            return UserEnvelope(**response.json())
+            UserEnvelope(**response.json())
         return response
+
 
     def delete_v1_account_login(
             self,

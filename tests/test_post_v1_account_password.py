@@ -1,32 +1,24 @@
-import time
 from dm_api_account.models.user_envelope import Roles
 from services import *
-from dm_api_account.models import *
 from hamcrest import assert_that, has_properties
 
 
 def test_post_v1_account_password():
-    api = DmApiAccount(host='http://5.63.153.31:5051')
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    login = "Cat30"
-    password = "meowmeow"
-    email = "Kitty_cat30@gmail.com"
+    api = Facade(host='http://5.63.153.31:5051')
+    login = "Fox11"
+    email = "Fox11@gmail.com"
+    old_password = "gavgav1"
 
-    json_account = Registration(
+    api.account.register_new_user(
         login=login,
         email=email,
-        password=password
+        password=old_password
     )
-    api.account.post_v1_account(json=json_account)
-    time.sleep(2)
-    token = mailhog.get_token_from_last_email()
-    api.account.put_v1_account_token(token=token)
-
-    json = ResetPassword(
+    api.account.activate_registered_user(login=login)
+    response = api.account.reset_registered_password(
         login=login,
         email=email
     )
-    response = api.account.post_v1_account_password(json=json)
     assert_that(response.resource, has_properties(
         {
             "login": login,

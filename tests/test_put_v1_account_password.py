@@ -1,43 +1,33 @@
-import time
 from services import *
-from dm_api_account.models import *
 from hamcrest import assert_that, has_properties
 from dm_api_account.models.user_envelope import Roles
 
 
 def test_put_v1_account_password():
-    api = DmApiAccount(host='http://5.63.153.31:5051')
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    login = "Cat__"
-    email = "Kitty_cat__@gmail.com"
-    old_password = "meowmeow1"
-    new_password = "meowmeow2"
+    api = Facade(host='http://5.63.153.31:5051')
+    login = "Fox5"
+    email = "Fox5@gmail.com"
+    old_password = "gavgav1"
+    new_password = "gavgav2"
 
-    json_account = Registration(
+    api.account.register_new_user(
         login=login,
         email=email,
         password=old_password
     )
-    api.account.post_v1_account(json=json_account)
-    time.sleep(2)
-    token_create = mailhog.get_token_from_last_email()
-    api.account.put_v1_account_token(token=token_create)
-
-    json = ResetPassword(
+    api.account.activate_registered_user(login=login)
+    api.account.reset_registered_password(
         login=login,
         email=email
     )
-    api.account.post_v1_account_password(json=json)
-    time.sleep(2)
-    token_reset = mailhog.get_token_from_last_email_by_name(login=login) # '82c1996e-84fb-40d8-b58c-80192dc2bbe'
+    headers = api.login.get_auth_token(login=login, password=old_password)
+    api.account.set_headers(headers=headers)
 
-    json = ChangePassword(
+    response_password = api.account.change_registered_password(
         login=login,
-        token=token_reset,
-        oldPassword=old_password,
-        newPassword=new_password
-    )
-    response_password = api.account.put_v1_account_password(json=json)
+        old_password=old_password,
+        new_password=new_password)
+
     assert_that(response_password.resource, has_properties(
         {
             "login": login,
