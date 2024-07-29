@@ -3,4 +3,6 @@ pytest
 structlog
 curlify
 pydantic
-enam
+records
+psycopg2
+PyHamcrest
