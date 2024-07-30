@@ -14,9 +14,11 @@ def test_post_v1_account():
 
     try:
         dataset_delete = db.delete_user_by_login(login=login)
+        api.mailhog.delete_massage_by_login(login=login)
         assert len(dataset_delete) == 0
     except:
         pass
+
     api.account.register_new_user(
         login=login,
         email=email,

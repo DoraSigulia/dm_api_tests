@@ -38,6 +38,15 @@ class MailhogApi:
             })
         return response
 
+    def delete_api_v2_massages(self, id_massage: str):
+        """
+        Delete massage by login
+        :id_massage:
+        """
+        self.client.delete(
+            path=f'/api/v1/messages/{id_massage}'
+        )
+
     def get_api_v2_search(self, query) -> Response:
         """
         Get messages by query
@@ -107,3 +116,18 @@ class MailhogApi:
                 return token
         time.sleep(1)
         return self.get_token_by_login(login=login, attempt=attempt - 1)
+
+    # Решила не удалять все письма других учеников
+    def delete_massage_by_login(
+            self,
+            login: str,
+            limit: int = 5,
+            attempt: int = 5
+    ):
+        if attempt == 0:
+            raise AssertionError(f"Пользователь с логином {login} не найден")
+        id_massage = self.get_api_v2_massages(limit=limit).json()['items'][0]['ID']
+        self.delete_api_v2_massages(id_massage)
+        time.sleep(1)
+
+
