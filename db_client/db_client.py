@@ -13,7 +13,10 @@ class DbClient:
 
     def __init__(self, user, password, host, database, isolation_level='AUTOCOMMIT'):
         connection_string = f"postgresql://{user}:{password}@{host}:5432/{database}"
-        self.db = records.Database(connection_string, isolation_level=isolation_level)
+        self.db = records.Database(
+            connection_string,
+            isolation_level=isolation_level
+        )
         self.log = structlog.get_logger(__class__.__name__).bind(service='db')
 
     def send_query(self, query):

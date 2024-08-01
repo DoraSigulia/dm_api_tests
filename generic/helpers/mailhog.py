@@ -25,7 +25,7 @@ class MailhogApi:
         self.client = Restclient(host=host)
 
     @decorator
-    def get_api_v2_massages(self, limit: int = 50) -> Response:
+    def get_api_v2_messages(self, limit: int = 50) -> Response:
         """
         Get messages by limit
         :param limit:
@@ -38,13 +38,13 @@ class MailhogApi:
             })
         return response
 
-    def delete_api_v2_massages(self, id_massage: str):
+    def delete_api_v1_messages(self, id_message: str):
         """
-        Delete massage by login
+        Delete message by login
         :id_massage:
         """
         self.client.delete(
-            path=f'/api/v1/messages/{id_massage}'
+            path=f'/api/v1/messages/{id_message}'
         )
 
     def get_api_v2_search(self, query) -> Response:
@@ -67,7 +67,7 @@ class MailhogApi:
         Get user activation token from last email
         :return:
         """
-        email = self.get_api_v2_massages(limit=1).json()
+        email = self.get_api_v2_messages(limit=1).json()
         token_url = (json.loads(email['items'][0]['Content']['Body']))['ConfirmationLinkUrl']
         return token_url.split('/')[-1]
 
@@ -77,7 +77,7 @@ class MailhogApi:
         :return:
         """
         self.get_api_v2_search(query=login)
-        email = self.get_api_v2_massages(limit=1).json()
+        email = self.get_api_v2_messages(limit=1).json()
         token_url = (json.loads(email['items'][0]['Content']['Body']))['ConfirmationLinkUri']
         return token_url.split('/')[-1]
 
@@ -89,7 +89,7 @@ class MailhogApi:
     ):
         if attempt == 0:
             raise AssertionError(f"Пользователь с логином {login} не найден")
-        emails = self.get_api_v2_massages(limit=limit).json()['items']
+        emails = self.get_api_v2_messages(limit=limit).json()['items']
         for email in emails:
             user_data = json.loads(email['Content']['Body'])
             if login == user_data.get('Login'):
@@ -107,7 +107,7 @@ class MailhogApi:
     ):
         if attempt == 0:
             raise AssertionError(f"Пользователь с логином {login} не найден")
-        emails = self.get_api_v2_massages(limit=limit).json()['items']
+        emails = self.get_api_v2_messages(limit=limit).json()['items']
         for email in emails:
             user_data = json.loads(email['Content']['Body'])
             if login == user_data.get('Login'):
@@ -117,8 +117,7 @@ class MailhogApi:
         time.sleep(1)
         return self.get_token_by_login(login=login, attempt=attempt - 1)
 
-    # Решила не удалять все письма других учеников
-    def delete_massage_by_login(
+    def delete_message_by_login(
             self,
             login: str,
             limit: int = 5,
@@ -126,8 +125,11 @@ class MailhogApi:
     ):
         if attempt == 0:
             raise AssertionError(f"Пользователь с логином {login} не найден")
-        id_massage = self.get_api_v2_massages(limit=limit).json()['items'][0]['ID']
-        self.delete_api_v2_massages(id_massage)
+        emails = self.get_api_v2_messages(limit=limit).json()['items']
+        for email in emails:
+            if login == json.loads(email['Content']['Body']).get('Login'):
+                id_message = email['ID']
+                self.delete_api_v1_messages(id_message)
+                return
         time.sleep(1)
-
-
+        return self.delete_message_by_login(login=login, attempt=attempt - 1)

@@ -11,14 +11,8 @@ def test_post_v1_account():
     login = "Cat"
     email = "Kitty111@gmail.com"
     password = "meowmeow"
-
-    try:
-        dataset_delete = db.delete_user_by_login(login=login)
-        api.mailhog.delete_massage_by_login(login=login)
-        assert len(dataset_delete) == 0
-    except:
-        pass
-
+    db.delete_user_by_login(login=login)
+    api.mailhog.delete_message_by_login(login=login)
     api.account.register_new_user(
         login=login,
         email=email,
