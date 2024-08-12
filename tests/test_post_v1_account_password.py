@@ -1,13 +1,17 @@
 from dm_api_account.models.user_envelope import Roles
+from generic.helpers.orm_db import OrmDatabase
 from services import *
 from hamcrest import assert_that, has_properties
 
 
 def test_post_v1_account_password():
     api = Facade(host='http://5.63.153.31:5051')
-    login = "Fox11"
-    email = "Fox11@gmail.com"
-    old_password = "gavgav1"
+    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
+    login = "Cat"
+    email = "Cat@gmail.com"
+    old_password = "meowmeow"
+    orm.delete_user_by_login(login=login)
+    api.mailhog.delete_message_by_login(login=login)
 
     api.account.register_new_user(
         login=login,
@@ -26,3 +30,4 @@ def test_post_v1_account_password():
             "medium_picture_url": None
         }
     ))
+    orm.db.close_connection()

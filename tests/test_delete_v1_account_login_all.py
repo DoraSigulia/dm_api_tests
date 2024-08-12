@@ -1,11 +1,15 @@
+from generic.helpers.orm_db import OrmDatabase
 from services import *
 
 
 def test_delete_v1_account_login():
     api = Facade(host='http://5.63.153.31:5051')
-    login = "Fox8"
-    email = "Fox8@gmail.com"
-    password = "gavgav"
+    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
+    login = "Cat"
+    email = "Cat@gmail.com"
+    password = "meowmeow"
+    orm.delete_user_by_login(login=login)
+    api.mailhog.delete_message_by_login(login=login)
 
     api.account.register_new_user(
         login=login,
@@ -16,3 +20,4 @@ def test_delete_v1_account_login():
     headers = api.login.get_auth_token(login=login, password=password)
     api.login.set_headers(headers=headers)
     api.login.logout_from_every_device()
+    orm.db.close_connection()

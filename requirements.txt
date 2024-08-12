@@ -6,3 +6,5 @@ pydantic
 records
 psycopg2
 PyHamcrest
+SQLAlchemy
+sqlacodegen
