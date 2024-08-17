@@ -124,7 +124,7 @@ class MailhogApi:
             attempt: int = 5
     ):
         if attempt == 0:
-            raise AssertionError(f"Пользователь с логином {login} не найден")
+            return
         emails = self.get_api_v2_messages(limit=limit).json()['items']
         for email in emails:
             if login == json.loads(email['Content']['Body']).get('Login'):

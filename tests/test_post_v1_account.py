@@ -1,41 +1,79 @@
 import time
-from generic.helpers.orm_db import OrmDatabase
+import pytest
 from generic.helpers.orm_models import User
-from services import *
+from hamcrest import assert_that, has_properties, has_entries
 from dm_api_account.models.user_envelope import Roles
-from hamcrest import assert_that, has_properties
+from string import ascii_letters, digits
+import random
 
 
-def test_post_v1_account():
-    api = Facade(host='http://5.63.153.31:5051')
-    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-    login = "Cat"
-    email = "Cat@gmail.com"
-    password = "meowmeow"
-    orm.delete_user_by_login(login=login)
-    api.mailhog.delete_message_by_login(login=login)
-    api.account.register_new_user(
+def random_string(begin=1, end=30):
+    symbols = ascii_letters + digits
+    string = ''
+    for _ in range(random.randint(begin, end)):
+        string += random.choice(symbols)
+    return string
+
+
+@pytest.mark.parametrize('login, email, password, status_code, check', [
+    ('User', 'user@mail.ru', 'user123', 201, ''),
+    ('User', 'user@mail.ru', random_string(1, 1), 400, {'Password': ['Short']}),
+    ('User', 'user@mail.ru', random_string(1000, 1000), 201, ''),
+    (random_string(1, 1), random_string(5, 6) + '@mail.ru', random_string(6, 10), 400, {'Login': ['Short']}),
+    ('', random_string(5, 6) + '@mail.ru', random_string(6, 10), 400, {'Login': ['Empty', 'Short']}),
+    (random_string(1000, 1000), random_string(5, 6) + '@mail.ru', random_string(6, 10), 400, {'Login': ['Long']}),
+    ('User', '@mail.ru', random_string(6, 10), 400, {'Email': ['Invalid']}),
+    ('User', random_string(6, 10), random_string(6, 10), 400, {'Email': ['Invalid']}),
+])
+def test_post_v1_account(
+        mailhog,
+        dm_api_facade,
+        orm,
+        prepare_user,
+        status_code,
+        check
+):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
+    status_code = status_code
+    response = dm_api_facade.account.register_new_user(
         login=login,
         email=email,
-        password=password
+        password=password,
+        status_code=status_code
     )
-    dataset = orm.get_user_by_user(login=login)
-    row: User
-    for row in dataset:
-        assert row.Login == login, f"User {login} is not found"
-        assert row.Activated is False, f"User {login} is not activated"
+    if status_code == 201:
+        dataset = orm.get_user_by_user(login=login)
+        row: User
+        for row in dataset:
+            assert_that(row, has_entries(
+                {
+                    'Login': login,
+                    'Activated': False
+                }
+            ))
+        response_token = dm_api_facade.account.activate_registered_user(login=login)
+        time.sleep(2)
+        dataset2 = orm.get_user_by_user(login=login)
+        for row in dataset2:
+            assert_that(row, has_entries(
+                {
+                    'Activated': True
+                }
+            ))
 
-    response_token = api.account.activate_registered_user(login=login)
-    time.sleep(2)
-    dataset2 = orm.get_user_by_user(login=login)
-    for row in dataset2:
-        assert row.Activated is True, f"User {login} is not activated"
+        assert_that(response_token.resource, has_properties(
+            {
+                "login": login,
+                "roles": [Roles.GUEST, Roles.PLAYER],
+                "medium_picture_url": None
+            }
+        ))
 
-    assert_that(response_token.resource, has_properties(
-        {
-            "login": login,
-            "roles": [Roles.GUEST, Roles.PLAYER],
-            "medium_picture_url": None
-        }
-    ))
-    orm.db.close_connection()
+    else:
+        assert_that(response.json(), has_entries(
+            {
+                'errors': check
+            }
+        ))

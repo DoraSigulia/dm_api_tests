@@ -15,7 +15,7 @@ class AccountApi:
     def post_v1_account(
             self,
             json: Registration,
-            status_code: int = 201,
+            status_code: int,
             **kwargs
     ) -> Response:
         """

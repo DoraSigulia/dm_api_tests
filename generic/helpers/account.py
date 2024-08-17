@@ -13,14 +13,16 @@ class Account:
             self,
             login: str,
             email: str,
-            password: str
+            password: str,
+            status_code: int
     ):
         response = self.facade.account_api.post_v1_account(
             json=Registration(
                 login=login,
                 email=email,
                 password=password
-            ))
+            ),
+            status_code=status_code)
         return response
 
     def get_current_user(self, **kwargs):
