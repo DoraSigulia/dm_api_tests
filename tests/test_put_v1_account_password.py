@@ -1,35 +1,35 @@
-from generic.helpers.orm_db import OrmDatabase
-from services import *
 from hamcrest import assert_that, has_properties
 from dm_api_account.models.user_envelope import Roles
 
 
-def test_put_v1_account_password():
-    api = Facade(host='http://5.63.153.31:5051')
-    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-    login = "Cat"
-    email = "Cat@gmail.com"
-    old_password = "meowmeow"
-    new_password = "gavgav"
-    orm.delete_user_by_login(login=login)
-    api.mailhog.delete_message_by_login(login=login)
-
-    api.account.register_new_user(
+def test_put_v1_account_password(
+        mailhog,
+        dm_api_facade,
+        orm,
+        prepare_user
+):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
+    status_code = prepare_user.status_code
+    dm_api_facade.account.register_new_user(
         login=login,
         email=email,
-        password=old_password
+        password=password,
+        status_code=status_code
     )
-    api.account.activate_registered_user(login=login)
-    api.account.reset_registered_password(
+    new_password = "123user"
+    dm_api_facade.account.activate_registered_user(login=login)
+    dm_api_facade.account.reset_registered_password(
         login=login,
         email=email
     )
-    headers = api.login.get_auth_token(login=login, password=old_password)
-    api.account.set_headers(headers=headers)
+    headers = dm_api_facade.login.get_auth_token(login=login, password=password)
+    dm_api_facade.account.set_headers(headers=headers)
 
-    response_password = api.account.change_registered_password(
+    response_password = dm_api_facade.account.change_registered_password(
         login=login,
-        old_password=old_password,
+        old_password=password,
         new_password=new_password)
 
     assert_that(response_password.resource, has_properties(
@@ -46,4 +46,3 @@ def test_put_v1_account_password():
             "quantity": 0
         }
     ))
-    orm.db.close_connection()

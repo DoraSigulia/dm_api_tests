@@ -26,14 +26,14 @@ def orm():
 @pytest.fixture
 def prepare_user(
         dm_api_facade,
-        orm,
-        login, email, password
+        orm
 ):
-    user = namedtuple('User', 'login, email, password')
+    user = namedtuple('User', 'login, email, password, status_code')
     User = user(
-        login=login,
-        email=email,
-        password=password
+        login='User',
+        email='user@mail.ru',
+        password='user123',
+        status_code=201
     )
     orm.delete_user_by_login(login=User.login)
     dm_api_facade.mailhog.delete_message_by_login(login=User.login)

@@ -1,26 +1,26 @@
-from generic.helpers.orm_db import OrmDatabase
 from generic.helpers.orm_models import User
-from services import *
 from hamcrest import assert_that, has_properties
 
 
-def test_put_v1_account_email():
-    api = Facade(host='http://5.63.153.31:5051')
-    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-    login = "Cat"
-    email = "Cat@gmail.com"
-    new_email = "Fox@gmail.com"
-    password = "meowmeow"
-    orm.delete_user_by_login(login=login)
-    api.mailhog.delete_message_by_login(login=login)
-
-    api.account.register_new_user(
+def test_put_v1_account_email(
+        mailhog,
+        dm_api_facade,
+        orm,
+        prepare_user
+):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
+    status_code = prepare_user.status_code
+    dm_api_facade.account.register_new_user(
         login=login,
         email=email,
-        password=password
+        password=password,
+        status_code=status_code
     )
-    api.account.activate_registered_user(login=login)
-    response_email = api.account.change_registered_email(login=login, password=password, email=new_email)
+    new_email = "Fox@gmail.com"
+    dm_api_facade.account.activate_registered_user(login=login)
+    response_email = dm_api_facade.account.change_registered_email(login=login, password=password, email=new_email)
     dataset = orm.get_user_by_user(login=login)
     row: User
     for row in dataset:
@@ -33,4 +33,4 @@ def test_put_v1_account_email():
             "quantity": 0
         }
     ))
-    orm.db.close_connection()
+
