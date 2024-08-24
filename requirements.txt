@@ -8,3 +8,4 @@ psycopg2
 PyHamcrest
 SQLAlchemy
 sqlacodegen
+vyper-config
