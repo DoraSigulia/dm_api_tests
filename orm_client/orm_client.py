@@ -1,6 +1,29 @@
 import structlog
 from sqlalchemy import create_engine
 import uuid
+import allure
+
+
+def allure_attach(fn):
+    def wrapper(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        query = args[0] if args else None
+        statement = str(query)
+        params = kwargs.get('params', {})
+        report_content = (
+            f"Query: {statement}\n"
+            f"Parameters: {params}\n"
+            f"Result: {result}\n"
+        )
+        allure.attach(
+            report_content,
+            name="query",
+            attachment_type=allure.attachment_type.TEXT
+        )
+
+        return result
+
+    return wrapper
 
 
 class OrmClient:
@@ -13,13 +36,14 @@ class OrmClient:
     def close_connection(self):
         self.db.close()
 
+    @allure_attach
     def send_query(self, query):
         log = self.log.bind(event_id=str(uuid.uuid4()))
         log.msg(
             event='request',
             query=str(query)
         )
-        dataset = self.db.execute(statement=query)
+        dataset = self.db.execute(statement=query.compile(compile_kwargs={"literal_binds": True}))
         result = [row for row in dataset]
         log.msg(
             event='response',
@@ -27,11 +51,11 @@ class OrmClient:
         )
         return result
 
+    @allure_attach
     def send_bulk_query(self, query):
-        print(query)
         log = self.log.bind(event_id=str(uuid.uuid4()))
         log.msg(
             event='request',
             query=str(query)
         )
-        self.db.execute(statement=query)
+        self.db.execute(statement=query.compile(compile_kwargs={"literal_binds": True}))

@@ -1,5 +1,7 @@
 import json
 import time
+
+import allure
 from requests import Response
 from restclient.restclient import Restclient
 
@@ -81,6 +83,7 @@ class MailhogApi:
         token_url = (json.loads(email['items'][0]['Content']['Body']))['ConfirmationLinkUri']
         return token_url.split('/')[-1]
 
+    @allure.step("Получение активационного токена из письма на mailhog")
     def get_token_by_login(
             self,
             login: str,
@@ -99,6 +102,7 @@ class MailhogApi:
         time.sleep(1)
         return self.get_token_by_login(login=login, attempt=attempt - 1)
 
+    @allure.step("Получение токена сброва пароля из письма на mailhog")
     def get_reset_token_by_login(
             self,
             login: str,

@@ -1,4 +1,6 @@
 import pytest
+
+from generic.assertions.test_post_v1_account import AssertionsPostV1Account
 from generic.helpers.orm_db import OrmDatabase
 from services import *
 from generic.helpers.mailhog import MailhogApi
@@ -28,6 +30,11 @@ def orm():
         database=v.get('database.dm3_5.database'))
     yield orm
     orm.db.close_connection()
+
+
+@pytest.fixture()
+def assertions(orm):
+    return AssertionsPostV1Account(orm)
 
 
 options = (

@@ -3,7 +3,7 @@ from dm_api_account.models import *
 from dm_api_account.models import UserEnvelope
 from restclient.restclient import Restclient
 from dm_api_account.utilities import validate_request_json, validate_status_code
-
+import allure
 
 class LoginApi:
 
@@ -23,11 +23,11 @@ class LoginApi:
         :param json login_credential_model
         :return:
         """
-
-        response = self.client.post(
-            path="/v1/account/login",
-            json=validate_request_json(json)
-        )
+        with allure.step("Аутентификация через учетные данные"):
+            response = self.client.post(
+                path="/v1/account/login",
+                json=validate_request_json(json)
+            )
         validate_status_code(
             response,
             status_code
@@ -46,11 +46,11 @@ class LoginApi:
         Logout as current user
         :return:
         """
-
-        response = self.client.delete(
-            path="/v1/account/login",
-            **kwargs
-        )
+        with allure.step("Выйти из аккаунта"):
+            response = self.client.delete(
+                path="/v1/account/login",
+                **kwargs
+            )
         validate_status_code(
             response,
             status_code
@@ -66,11 +66,11 @@ class LoginApi:
         Logout from every device
         :return:
         """
-
-        response = self.client.delete(
-            path="/v1/account/login/all",
-            **kwargs
-        )
+        with allure.step("Выйти из аккаунта со всех девайсов"):
+            response = self.client.delete(
+                path="/v1/account/login/all",
+                **kwargs
+            )
         validate_status_code(
             response,
             status_code

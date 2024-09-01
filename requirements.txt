@@ -9,3 +9,4 @@ PyHamcrest
 SQLAlchemy
 sqlacodegen
 vyper-config
+allure-pytest
