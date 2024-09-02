@@ -1,5 +1,4 @@
 import allure
-
 from generic.helpers.orm_models import User
 from hamcrest import assert_that, has_properties, has_entries
 from dm_api_account.models.user_envelope import Roles
@@ -22,7 +21,7 @@ class AssertionsPostV1Account:
                 }
             ))
 
-    @allure.step("Проверка, что пользователь активирован")
+    @allure.step("Проверка по БД что пользователь активирован")
     def check_user_was_activated(self, login):
         dataset2 = self.orm.get_user_by_user(login=login)
         for row in dataset2:
