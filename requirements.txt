@@ -10,3 +10,7 @@ SQLAlchemy
 sqlacodegen
 vyper-config
 allure-pytest
+git+https://github.com/DoraSigulia/restclient.git
+git+https://github.com/DoraSigulia/orm_client.git
+git+https://github.com/DoraSigulia/db_client.git
+git+https://github.com/DoraSigulia/dm_api_account.git
