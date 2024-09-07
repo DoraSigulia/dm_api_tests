@@ -1,5 +1,5 @@
 from hamcrest import assert_that, has_properties
-from dm_api_account.models.user_envelope import Roles
+from apis.dm_api_account.models import *
 
 
 def test_put_v1_account_password(

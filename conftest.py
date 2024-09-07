@@ -1,5 +1,4 @@
 import pytest
-
 from generic.assertions.test_post_v1_account import AssertionsPostV1Account
 from generic.helpers.orm_db import OrmDatabase
 from services import *
@@ -7,6 +6,7 @@ from generic.helpers.mailhog import MailhogApi
 from collections import namedtuple
 from vyper import v
 from pathlib import Path
+from data.post_v1_account import PostV1Account as user_data
 
 
 @pytest.fixture
@@ -51,9 +51,9 @@ def prepare_user(
 ):
     user = namedtuple('User', 'login, email, password, status_code')
     User = user(
-        login='User',
-        email='user@mail.ru',
-        password='user123',
+        login=user_data.login,
+        email=user_data.email,
+        password=user_data.password,
         status_code=201
     )
     orm.delete_user_by_login(login=User.login)
