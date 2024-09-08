@@ -1,5 +1,5 @@
 from generic.helpers import *
-from apis.dm_api_account.apis import *
+from dm_api_account.apis import *
 
 
 class Facade:
